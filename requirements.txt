@@ -1,0 +1,7 @@
+torch
+onnx
+transformers
+tensorflow-probability
+tensorflow>=2.12
+onnx-tf
+tensorflowjs
