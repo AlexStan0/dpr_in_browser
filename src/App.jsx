@@ -1,16 +1,42 @@
 
+import { useState } from 'react';
 import './App.css';
 
 function App() {
 
   let possibleData;
+  const [ passages, setPassages ] = useState([]);
 
-  async function getData(event) {
+  const retrievePassages = async (query) => {
 
-      let query = event.target.value;
+        const fetchOptions = {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({query})
+        }
 
-      if(!query) return;
+        const response = await fetch('http://localhost:8000/retrieve', fetchOptions);
 
+        if(!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
+
+        const responseData = await response.json();
+        setPassages(responseData.passages);
+
+        possibleData = (
+          <>
+            <ul>
+              {
+                passages.map((passage, index) => (
+                  <li key={index}>
+                    <strong>Score:</strong> {passage.score.toFixed(4)} - <strong>Passage:</strong> {passage.passage}
+                  </li>
+                ))
+              }
+            </ul>
+          </>
+        )
   }
 
   return (
@@ -24,7 +50,7 @@ function App() {
       <div className="Query">
 
         <form>
-          <input type="text" id="query" name="query" onChange={getData}/>
+          <input type="text" id="query" name="query" onChange={(e) => retrievePassages(e.target.value)}/>
         </form>
         
       </div>
