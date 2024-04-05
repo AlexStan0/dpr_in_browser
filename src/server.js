@@ -27,13 +27,17 @@ function tokenize(text, callback) {
 }
 
 //Retrieve the passages based on query
-const retrievePassages = async (model, inputIds, attentionMask) => {
-    const inputTensorIds = tf.tensor([inputIds]);
-    const inputTensorMask = tf.tensor([attentionMask]);
+const retrievePassages = async (model, inputIds, attentionMask, passages) => {
+    const inputTensorIds = tf.tensor2d(inputIds); 
+    const inputTensorMask = tf.tensor2d(attentionMask); 
+
+    inputTensorIds.cast("int32");
+    inputTensorMask.cast("int32");
+
     const output = await model.predict({ input_ids: inputTensorIds, attention_mask: inputTensorMask });
     const scores = output.dataSync();
     return postProcessScores(scores, passages);
-}
+};
 
 const postProcessScores = (scores, passages) => {
     const sortedPassages = passages.map((passage, index) => ({ passage, score: scores[index] }));
@@ -58,30 +62,30 @@ app.post('/retrieve', async (req, res) => {
     // Flag to track if response has been sent
     let responseSent = false;
 
-    // tokenize(query, async (error, data) => {
+    tokenize(query, async (error, data) => {
 
-    //     // Check if response has already been sent
-    //     if (responseSent) return;
+        // Check if response has already been sent
+        if (responseSent) return;
 
-    //     if (error) {
+        if (error) {
 
-    //         // Handle error
-    //         console.error('Error during tokenization:', error);
-    //         res.status(500).json({ error: 'An error occurred during tokenization' });
+            // Handle error
+            console.error('Error during tokenization:', error);
+            res.status(500).json({ error: 'An error occurred during tokenization' });
 
-    //     } else {
+        } else {
 
-    //         // Send response
-    //         let parsedData = JSON.parse(data);
-    //         const scoredPassages = await retrievePassages(model, parsedData['input_ids'], parsedData['attention_mask']);
-    //         console.log(scoredPassages)
+            // Send response
+            let parsedData = JSON.parse(data);
+            const scoredPassages = await retrievePassages(model, parsedData['input_ids'], parsedData['attention_mask'], passageData);
+            console.log(scoredPassages)
             
-    //     }
+        }
 
-    //     // Set responseSent flag to true
-    //     responseSent = true;
+        // Set responseSent flag to true
+        responseSent = true;
 
-    // });
+    });
 
     tokenize(query, async (error, data) => {})
 
