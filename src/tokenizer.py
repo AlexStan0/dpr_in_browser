@@ -1,13 +1,12 @@
 import sys
 import json
 from transformers import DPRQuestionEncoderTokenizer
-import numpy as np
 
 def tokenize(text):
     tokenizer = DPRQuestionEncoderTokenizer.from_pretrained('facebook/dpr-ctx_encoder-single-nq-base')
     encoded_input = tokenizer(text, return_tensors="pt")
-    input_ids = list(map(int, encoded_input['input_ids'].tolist()))
-    attention_mask = list(map(int, encoded_input['attention_mask'].tolist()))
+    input_ids = encoded_input['input_ids'].tolist()
+    attention_mask = encoded_input['attention_mask'].tolist()
 
     tokenized_output = {
         'input_ids': input_ids,

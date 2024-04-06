@@ -28,14 +28,12 @@ function tokenize(text, callback) {
 
 //Retrieve the passages based on query
 const retrievePassages = async (model, inputIds, attentionMask, passages) => {
-    const inputTensorIds = tf.tensor2d(inputIds); 
-    const inputTensorMask = tf.tensor2d(attentionMask); 
+    // Convert inputIds and attentionMask to int32
+    const inputTensorIds = tf.tensor2d(inputIds.map(row => row.map(val => parseInt(val))), [inputIds.length, inputIds[0].length], 'int32'); 
+    const inputTensorMask = tf.tensor2d(attentionMask.map(row => row.map(val => parseInt(val))), [attentionMask.length, attentionMask[0].length], 'int32'); 
 
-    inputTensorIds.cast("int32");
-    inputTensorMask.cast("int32");
-
-    const output = await model.predict({ input_ids: inputTensorIds, attention_mask: inputTensorMask });
-    const scores = output.dataSync();
+    const output = await model.executeAsync({ input_ids: inputTensorIds, attention_mask: inputTensorMask });
+    const scores = output.arraySync();
     return postProcessScores(scores, passages);
 };
 
