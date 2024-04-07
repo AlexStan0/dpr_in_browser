@@ -2,7 +2,21 @@ import { useState } from 'react';
 import './App.css';
 
 function App() {
+
   const [passages, setPassages] = useState([]);
+  let typingTimer; 
+  const doneTypingInterval = 500;
+
+  const handleInputChange = (e) => {
+
+      clearTimeout(typingTimer); // Clear the previous timer
+
+      // Start a new timer to call retrievePassages after a delay
+      typingTimer = setTimeout(() => {
+          retrievePassages(e.target.value);
+      }, doneTypingInterval);
+
+  };
 
   const retrievePassages = async (query) => {
     const fetchOptions = {
@@ -34,21 +48,11 @@ function App() {
       </div>
 
       <div className="Query">
-        <form>
-          <input type="text" id="query" name="query" onChange={(e) => retrievePassages(e.target.value)} />
-        </form>
+          <form>
+              <input type="text" id="query" name="query" onChange={handleInputChange} />
+          </form>
       </div>
 
-      <div>
-        <ul>
-          {/* Map through passages and render each passage */}
-          {passages.map((passage, index) => (
-            <li key={index}>
-              <strong>Score:</strong> {passage.score.toFixed(4)} - <strong>Passage:</strong> {passage.passage}
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 }
