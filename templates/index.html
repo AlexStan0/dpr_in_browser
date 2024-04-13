@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Passage Retrieval</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            margin: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: calc(100% - 40px); /* Adjust the width to leave a 20px margin on each side */
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+            word-wrap: break-word;
+            max-width: calc(50% - 40px); /* Adjust to leave room for margins */
+        }
+    </style>
+</head>
+<body>
+    <div class="Header">
+        <h1 id="title">Deep Passage Retrieval</h1>
+    </div>
+    
+    <div class="Query">
+        <form method="POST" action="/" id="searchForm">
+            <input type="text" id="query" name="query" oninput="submitQuery()" />
+            <input type="submit" value="Search" style="display:none" />
+        </form>
+                
+        <script>
+            let typingTimer;
+            const doneTypingInterval = 500; // Adjust the delay (in milliseconds) as needed
+        
+            function submitQuery() {
+                clearTimeout(typingTimer);
+                typingTimer = setTimeout(sendForm, doneTypingInterval);
+            }
+        
+            let sendForm = () => { 
+                document.getElementById('searchForm').submit(); 
+                console.log("sent");
+            }
+        </script>
+    </div>
+
+    <div id="passages" class="Passages">
+        <table>
+            <tr>
+                <th>Passage</th>
+                <th>MRR Score</th>
+            </tr>
+            {% for passage, mrr_score in top_passages %}
+            <tr>
+                <td>{{ passage }}</td>
+                <td>{{ mrr_score }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>

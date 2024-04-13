@@ -1,7 +1,4 @@
-torch
-onnx
+flask
 transformers
-tensorflow-probability
-tensorflow>=2.12
-onnx-tf
-tensorflowjs
+torch
+scikit-learn
