@@ -29,25 +29,12 @@ function tokenize(text, callback) {
 //Retrieve the passages based on query
 const retrievePassages = async (model, inputIds, attentionMask, data) => {
 
-    // Convert inputIds and attentionMask to int32
-    const inputTensorIds = tf.tensor2d(inputIds.map(row => row.map(val => parseInt(val))), [inputIds.length, inputIds[0].length], 'int32'); 
-    const inputTensorMask = tf.tensor2d(attentionMask.map(row => row.map(val => parseInt(val))), [attentionMask.length, attentionMask[0].length], 'int32'); 
+    // Convert inputIds and attentionMask to int32 tensors
+    const inputTensorIds = tf.tensor2d(inputIds, null, 'int32'); 
+    const inputTensorMask = tf.tensor2d(attentionMask, null, 'int32');
 
-    const output = await model.executeAsync({ input_ids: inputTensorIds, attention_mask: inputTensorMask });
-    const scores = output.map(tensor => tensor.arraySync()[0]);
-    
-    console.log(scores)
-    
-    const passages = Object.entries(data)[0][1].map((passage, index) => ({
-        passage_contex: passage.context,
-        passage_title: passage.title,
-        score: scores[index]
-    }));
-
-    passages.sort((a, b) => b.score - a.score);
-    
-    console.log(passages);
-
+    const output = model.execute({ input_ids: inputTensorIds, attention_mask: inputTensorMask });
+    console.log(output);
 };
 
 // Make sure it's running 
@@ -83,7 +70,6 @@ app.post('/retrieve', async (req, res) => {
             // Send response
             let parsedData = JSON.parse(data);
             const scoredPassages = await retrievePassages(model, parsedData['input_ids'], parsedData['attention_mask'], passageData);
-            console.log(scoredPassages);
             res.json({scoredPassages});
             
         }
