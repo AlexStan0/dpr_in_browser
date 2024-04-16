@@ -10,12 +10,20 @@ app = Flask(__name__)
 tokenizer = DPRQuestionEncoderTokenizer.from_pretrained("facebook/dpr-question_encoder-multiset-base")
 model = DPRQuestionEncoder.from_pretrained("facebook/dpr-question_encoder-multiset-base")
 
-# Preprocess the data
-with open('downloads/data/gold_passages_info/nq_dev.json', 'r') as f:
-    json_data = json.load(f)
+# Preprocess the data - NQ_DEV DATA SET
+# with open('downloads/data/gold_passages_info/nq_dev.json', 'r') as f:
+#     json_data = json.load(f)
 
-# Get the contexts from the JSON data
-passages = [item["context"] for item in json_data["data"]]
+# Get the contexts from the JSON data - NQ_DEV DATA SET
+# passages = [item["context"] for item in json_data["data"]]
+
+passages = []
+
+# Preprocess the data - NFCORPUS
+with open('collections/nfcorpus/corpus.jsonl', 'r') as f:
+    for line in f:
+        item = json.loads(line)
+        passages.append([item["_id"], item["text"]])
 
 passage_embeddings = []
 
@@ -35,7 +43,7 @@ for batch_idx in range(num_batches):
 
         # Tokenize the passage
         encoded_passage = tokenizer.encode_plus(
-            passage,
+            passage[1],
             max_length=512,
             padding="max_length",
             truncation=True,
@@ -91,14 +99,16 @@ def index():
         true_passage_index = ranked_passages[0][0]
         mrr = calculate_mrr(ranked_passages, true_passage_index)
 
-        # Get the top 10 passages' content
+        # Get the top 5 passages' content
         top_passages = ranked_passages[:5]
+        top_passages_text = [passage[1] for passage in top_passages]
+        top_passages_id = [passage[0] for passage in top_passages]
 
-        return render_template('index.html', top_passages=top_passages, mrr=mrr)
+        return render_template('index.html', top_passages_id=top_passages_id, top_passages_text=top_passages_text, mrr=mrr)
 
     else:
 
-        return render_template('index.html', top_passages=[], mrr=None)
+        return render_template('index.html', top_passages_id=[], top_passages_text=[], mrr=None)
         
 
 if __name__ == '__main__':
