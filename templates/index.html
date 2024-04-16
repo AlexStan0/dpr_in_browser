@@ -53,12 +53,14 @@
     <div id="passages" class="Passages">
         <table>
             <tr>
+                <td>Passage Title</td>
                 <th>Passage</th>
                 <th>MRR@100</th>
             </tr>
             {% for passage, mrr_score in top_passages %}
             <tr>
-                <td>{{ passage }}</td>
+                <td>{{ passage[0] }}</td>
+                <td>{{ passage[1] }}</td>
                 <td>{{ mrr_score }}</td>
             </tr>
             {% endfor %}

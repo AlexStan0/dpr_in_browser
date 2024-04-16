@@ -15,7 +15,7 @@ with open('downloads/data/gold_passages_info/nq_dev.json', 'r') as f:
     json_data = json.load(f)
 
 # Get the contexts from the JSON data
-passages = [item["context"] for item in json_data["data"]]
+passages = [[item["title"], item["context"]] for item in json_data["data"]]
 
 passage_embeddings = []
 
@@ -35,7 +35,7 @@ for batch_idx in range(num_batches):
 
         # Tokenize the passage
         encoded_passage = tokenizer.encode_plus(
-            passage,
+            passage[1],
             max_length=512,
             padding="max_length",
             truncation=True,
