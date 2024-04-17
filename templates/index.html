@@ -57,12 +57,13 @@
                 <th>Passage</th>
                 <th>MRR@100</th>
             </tr>
-            {% top_passage_text, top_passage_id, mrr %}
+            {% for passage, mrr_score in top_passages %}
             <tr>
                 <td>{{ top_passage_id }} </td>
                 <td>{{ top_passage_text }}</td>
                 <td>{{ mrr }}</td>
             </tr>
+            {% endfor %}
         </table>
     </div>
 </body>
