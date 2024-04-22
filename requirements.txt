@@ -1,4 +1,3 @@
-flask
+torch 
+onnx
 transformers
-torch
-scikit-learn
